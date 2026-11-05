@@ -1,0 +1,19 @@
+.venv/
+__pycache__/
+startup_validation.log
+browser_validation.log
+validation_chart.png
+build/
+dist/
+exe_validation.log
+build_exe.log
+unit_exe.log
+
+# Mesures et résultats locaux : ne pas publier sur GitHub.
+*.csv
+*.CSV
+*.tra
+*.TRA
+Data*.txt
+validation_results.json
+SAUVEGARDE_MANIFEST.json
