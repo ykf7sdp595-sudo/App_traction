@@ -1,4 +1,4 @@
-# Courbes de traction — phases 1 à 5, validation phase 6
+# Courbes de traction — V1.1
 
 Application locale Streamlit : import CSV/TRA/TXT, superposition, aperçu,
 unités, couleurs, légendes, limites d'axes et export PNG.
@@ -6,21 +6,24 @@ Corrections, précharge, sélection de zone et filtre sont disponibles par courb
 Maxima, pics, rupture candidate et annotations physiques sont disponibles.
 Les lots, traitements groupés et statistiques de forces sont disponibles.
 
-## Sauvegarde GitHub de la version testée
+## Sources et données locales
 
-Ce dépôt sauvegarde les sources de la version testée le 5 novembre 2026.
+La présente version reprend les analyses de traction et leur validation initiale du 5 novembre 2026, avec une interface réorganisée.
 Les fichiers de mesure, captures, résultats générés et exécutables ne sont pas
 publiés. L'exécutable peut être reconstruit avec `construire_exe.bat`.
 Les tests utilisant les exemples TRA/CSV/TXT nécessitent ces fichiers locaux,
 absents du dépôt ; les résultats de validation documentés ont été obtenus sur
 le poste de développement avec ces exemples.
 
+La version précédente est conservée dans la branche [`v1`](https://github.com/ykf7sdp595-sudo/App_traction/tree/v1).
+La branche `main` contient la V1.1. Les changements sont décrits dans [CHANGELOG.md](CHANGELOG.md).
+
 ## Version Windows sans Python
 
 Double-cliquer sur **`dist/App_traction.exe`**. Ce fichier peut être copié seul
 sur un poste Windows 64 bits : Python et les dépendances sont embarqués.
-L'application s'ouvre dans le navigateur. Fermer la fenêtre de lancement pour
-l'arrêter. Voir [le mode d'emploi de l'exécutable](UTILISATION_EXE.md).
+L'application s'ouvre dans le navigateur. Après fermeture du dernier onglet,
+elle s'arrête automatiquement après 15 secondes. Voir [le mode d'emploi de l'exécutable](UTILISATION_EXE.md).
 
 Pour reconstruire après une modification, lancer `construire_exe.bat` sur le
 poste de développement.
@@ -38,13 +41,12 @@ L'installation sur un second poste reste à vérifier.
 ```powershell
 python -m venv .venv
 python -m pip --python .venv/Scripts/python.exe install -r requirements.txt
-.venv/Scripts/python.exe -m streamlit run app.py --server.address localhost --browser.gatherUsageStats false
+.venv/Scripts/python.exe launcher.py
 ```
 
-Après installation, double-cliquer sur `lancer.bat`. Fermer le terminal arrête
-l'application. Les fichiers chargés et les réglages ne sont pas sauvegardés entre sessions.
-Les fichiers source ne sont jamais écrits. L'ancien fichier vide `App_traction`
-est conservé ; le point d'entrée exécutable est désormais `app.py`.
+Après installation, double-cliquer sur `lancer.bat`. La fermeture du dernier
+onglet arrête l'application après 15 secondes. Les fichiers chargés et les réglages
+ne sont pas sauvegardés entre sessions. Les fichiers source ne sont jamais écrits.
 
 ## Utilisation
 
@@ -54,7 +56,7 @@ est conservé ; le point d'entrée exécutable est désormais `app.py`.
    et données », « Traitements de la courbe » et « Analyse et annotations ».
    Le graphique commun apparaît au-dessus des onglets, avec le nombre de courbes
    et de points affichés. Les lots et les évènements libres restent sous les onglets.
-3. Choisir les axes dans le panneau gauche. Une courbe sans temps ne peut pas
+3. Ouvrir « Présentation et axes du graphique » sous le graphique pour choisir les axes. Une courbe sans temps ne peut pas
    apparaître sur un graphique temporel : aucune fréquence n'est inventée.
 4. Régler les titres et limites, puis zoomer si nécessaire.
 5. Choisir les dimensions PNG et cliquer sur l'appareil photo en haut du graphique.
@@ -65,7 +67,7 @@ Le graphique et les PNG utilisent systématiquement un fond blanc (zone de trac�
 marges, légende et étiquettes), avec des textes et axes sombres, quel que soit
 le thème de l'interface. Les courbes, marqueurs, flèches et bordures gardent leurs couleurs.
 
-« Premiers pas » présente le parcours général. Dans le panneau gauche, les
+« Premiers pas » présente le parcours général. Sous le graphique, les
 sections « Cadrage et dimensions » et « Exporter une image PNG » se déplient
 uniquement lorsque ces réglages sont utiles. Le bouton principal « Appliquer à
 cette courbe » valide les traitements ; un message signale les modifications
@@ -122,8 +124,8 @@ Les réglages s'appliquent uniquement à cette courbe, dans cet ordre :
 
 Le numéro du point source apparaît au survol pour repérer les bornes à saisir,
 y compris sur une branche retour. La sélection se fait par les champs numériques,
-pas par le rectangle de zoom. La comparaison au brut, activable dans le panneau
-gauche, affiche le signal original complet en pointillés et le signal traité en
+pas par le rectangle de zoom. La comparaison au brut, activable dans les réglages
+sous le graphique, affiche le signal original complet en pointillés et le signal traité en
 trait plein : le brut conserve ses origines et n'est pas réaligné artificiellement.
 
 Un résumé des opérations est affiché au-dessus du graphique. Un réglage invalide
@@ -283,20 +285,20 @@ consultables dans l'interface ; elles ne sont pas ajoutées au PNG du graphique.
 - `app.py` : interface et graphique. `cached_read` évite de relire les données
   lors d'un changement de présentation. Les paramètres sont associés au nom et
   au contenu du fichier pour rester stables lors d'un ajout ou retrait.
-- `test_readers.py` : cas de référence et erreurs de lecture, via `unittest`.
+- `tests/test_readers.py` : cas de référence et erreurs de lecture, via `unittest`.
 - `processing.py` : paramètres immuables et calculs purs, sans Streamlit.
 - `treatment_ui.py` : formulaire et réinitialisation des paramètres par courbe.
-- `test_processing.py` : ordre des traitements, seuils, filtre et absence de mutation.
+- `tests/test_processing.py` : ordre des traitements, seuils, filtre et absence de mutation.
 - `analysis.py` : extrema, pics à relief local et rupture candidate, sans dépendances.
 - `analysis_ui.py` : paramètres d'analyse, choix des marqueurs et zones Plotly.
-- `test_analysis.py` : plateaux, signes, espacement, chute et absence de rupture.
+- `tests/test_analysis.py` : plateaux, signes, espacement, chute et absence de rupture.
 - `batches.py` : statistiques des forces par lot, sans dépendance externe.
 - `batch_ui.py` : affectation des lots et copie contrôlée des paramètres.
 - `events_ui.py` : sélection par clic, marqueurs libres et édition par courbe.
 - `chart_ui.py` : graphique Plotly local avec remontée des clics de légende à Streamlit.
 - `curve_summary.py` : résumé des courbes visibles et statistiques par colonne.
-- `test_batches.py` : valeurs statistiques de référence, exclusions et conventions.
-- `test_interface.py` : parcours Streamlit avec les exemples, les trois vues
+- `tests/test_batches.py` : valeurs statistiques de référence, exclusions et conventions.
+- `tests/test_interface.py` : parcours Streamlit avec les exemples, les trois vues
   et les paramètres PNG, sans navigateur.
 - `requirements.txt` : seulement Streamlit et Plotly en dépendances directes
   (ils installent leurs propres dépendances transitives).
@@ -313,7 +315,7 @@ dépend de la mémoire et du navigateur ; valider les grosses campagnes sur le p
 ## Vérification
 
 ```powershell
-.venv/Scripts/python.exe -m unittest -v
+.venv/Scripts/python.exe -m unittest discover -s tests -v
 ```
 
 Références : 941 points TRA, 478 points CSV, 6 797 points TXT.
@@ -343,7 +345,7 @@ En cas de problème de lancement :
 - Environnement absent ou modules manquants : exécuter `installer.bat`.
 - Python introuvable : installer Python et rouvrir le terminal.
 - Échec réseau lors de l'installation : vérifier la connexion/proxy de l'entreprise.
-- Port occupé : garder l'application déjà ouverte ou lancer avec `--server.port 8502`.
-- Pour arrêter l'application : Ctrl+C dans son terminal. Ne pas compter sur la
-  fermeture du navigateur pour conserver la session ; aucun enregistrement de
-  session n'est disponible à ce stade.
+- Port occupé : garder l'application déjà ouverte ou lancer `launcher.py --port 8502`.
+- Pour arrêter l'application : fermer le dernier onglet ou utiliser Ctrl+C dans
+  le terminal. Les réglages et la session ne sont pas enregistrés.
+

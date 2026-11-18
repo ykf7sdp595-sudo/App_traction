@@ -140,3 +140,4 @@ def add_analysis(figure, curve, raw, displayed, points, x_quantity, y_quantity):
                         text=escape(title), showarrow=True, arrowhead=2, ax=30, ay=-45,
                         axref="pixel", ayref="pixel", borderpad=4,
                         bgcolor="white", bordercolor=color, arrowcolor=color, font=dict(color=color))
+

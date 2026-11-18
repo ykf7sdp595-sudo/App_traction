@@ -35,3 +35,4 @@ class SummaryTests(unittest.TestCase):
         rows, _ = build_summary([item("a", [1, 2, 3])], events, {}, "Force (N)")
         self.assertEqual(rows[0]["Évènement — Test [2] (N)"], 3)
         self.assertEqual(len(rows[0]), 5)
+

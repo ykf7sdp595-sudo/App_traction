@@ -22,3 +22,4 @@ if errorlevel 1 (
 )
 echo Installation terminee. Utiliser lancer.bat.
 pause
+

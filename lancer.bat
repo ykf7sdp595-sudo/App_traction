@@ -11,5 +11,6 @@ if errorlevel 1 (
     pause
     exit /b 1
 )
-".venv\Scripts\python.exe" -m streamlit run app.py --server.address localhost --browser.gatherUsageStats false
+".venv\Scripts\python.exe" launcher.py
 if errorlevel 1 pause
+

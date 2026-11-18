@@ -90,7 +90,7 @@ la réception graphique, la comparaison métier et le second poste restent ouver
 Depuis le dossier App_traction :
 
 ```powershell
-.venv/Scripts/python.exe -m unittest -v
+.venv/Scripts/python.exe -m unittest discover -s tests -v
 .venv/Scripts/python.exe validate_phase6.py
 .venv/Scripts/python.exe check_startup.py
 python -m pip --python .venv/Scripts/python.exe check
@@ -99,3 +99,4 @@ python -m pip --python .venv/Scripts/python.exe check
 `validate_phase6.py` met à jour `validation_results.json` avec les mesures et les
 empreintes. `check_startup.py` écrit `startup_validation.log`. Les tests ne créent
 pas de fichiers d'essai supplémentaires et ne modifient pas les données originales.
+

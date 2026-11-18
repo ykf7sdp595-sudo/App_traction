@@ -8,18 +8,21 @@ from readers import ImportErrorDetail, column_values, read_measurement
 
 class ReaderTests(unittest.TestCase):
     def test_reference_exports(self):
-        folder = Path(__file__).parent
+        folder = Path(__file__).resolve().parent.parent
         cases = [("Crimp tensile - cosse_1.TRA", 941, 1, 65.37660217285),
                  ("Force insertion  retention contact.CSV", 478, 1, 0.3055521249771),
                  ("Data_260602_155441.txt", 6797, 2, 173.65)]
         for name, count, force_column, maximum in cases:
             with self.subTest(name=name):
+                if not (folder / name).exists():
+                    self.skipTest("Fichiers de référence locaux absents")
                 data = read_measurement((folder / name).read_bytes())
                 self.assertEqual(len(data.rows), count)
                 self.assertAlmostEqual(max(r[force_column] for r in data.rows), maximum)
 
+    @unittest.skipUnless((Path(__file__).resolve().parent.parent / "Data_260602_155441.txt").exists(), "Fichier de référence local absent")
     def test_txt_keeps_both_groups_and_time_origin(self):
-        data = read_measurement((Path(__file__).parent / "Data_260602_155441.txt").read_bytes())
+        data = read_measurement((Path(__file__).resolve().parent.parent / "Data_260602_155441.txt").read_bytes())
         self.assertEqual(len(data.headers), 6)
         self.assertEqual(data.rows[0][0], 3.839)
         self.assertEqual(data.rows[-1][0], 10.635)
@@ -43,3 +46,4 @@ class ReaderTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

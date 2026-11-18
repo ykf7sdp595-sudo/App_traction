@@ -59,3 +59,4 @@ def lot_statistics(curves, mode="Maximum positif", filtered=False):
                         "Minimum (N)": min(values) if values else None,
                         "Maximum (N)": max(values) if values else None})
     return details, summary
+

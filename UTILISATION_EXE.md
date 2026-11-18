@@ -11,8 +11,9 @@ Un navigateur récent, par exemple Edge, est nécessaire.
 3. Le navigateur s'ouvre sur l'application. Si nécessaire, copier l'adresse
    `http://127.0.0.1:...` affichée dans la fenêtre de lancement.
 4. Charger les fichiers de mesure depuis le panneau gauche.
-5. Pour arrêter l'application, fermer la fenêtre de lancement ou utiliser
-   Ctrl+C dans cette fenêtre. Fermer uniquement l'onglet ne coupe pas le serveur.
+5. Fermer le dernier onglet de l'application : le serveur et sa fenêtre de
+   lancement s'arrêtent automatiquement après 15 secondes. Fermer la fenêtre
+   de lancement ou utiliser Ctrl+C reste possible.
 
 L'application fonctionne localement ; le serveur écoute uniquement sur le poste.
 Les fichiers d'exemple ne sont pas intégrés dans l'exécutable. Les réglages et
@@ -40,3 +41,4 @@ validation locale ne reproduit pas les politiques de sécurité de chaque poste.
 - Import réel des exemples TRA, CSV et TXT : 941, 478 et 6 797 points.
 - Affichage des trois courbes, masquage/réaffichage par légende et PNG 1600 × 900 : réussis.
 - Suite existante : 27 tests réussis.
+

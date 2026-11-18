@@ -19,12 +19,15 @@ def chart_element(app):
 
 
 @unittest.skipIf(AppTest is None, "Streamlit non installé dans ce Python")
+@unittest.skipUnless(all((Path(__file__).resolve().parent.parent / name).exists() for name in
+    ("Crimp tensile - cosse_1.TRA", "Force insertion  retention contact.CSV", "Data_260602_155441.txt")),
+    "Fichiers de référence locaux absents")
 class InterfaceTests(unittest.TestCase):
     def setUp(self):
         # Les fichiers de référence sont injectés comme des imports utilisateur.
         files = []
         for name in ("Crimp tensile - cosse_1.TRA", "Force insertion  retention contact.CSV", "Data_260602_155441.txt"):
-            file = BytesIO(Path(__file__).with_name(name).read_bytes())
+            file = BytesIO((Path(__file__).resolve().parent.parent / name).read_bytes())
             file.name = name
             files.append(file)
         uploader = patch("streamlit.file_uploader", return_value=files)
@@ -32,7 +35,7 @@ class InterfaceTests(unittest.TestCase):
         self.addCleanup(uploader.stop)
 
     def test_free_event_marker_lifecycle(self):
-        app = AppTest.from_file(str(Path(__file__).with_name("app.py")), default_timeout=30).run()
+        app = AppTest.from_file(str((Path(__file__).resolve().parent.parent / "app.py")), default_timeout=30).run()
         app.checkbox(key="event_enabled").check().run()
         self.assertFalse(app.exception)
         figure = json.loads(chart_element(app).proto.spec)
@@ -57,7 +60,7 @@ class InterfaceTests(unittest.TestCase):
         self.assertFalse(any(app.session_state.free_events.values()))
 
     def test_batch_assignment_copy_and_statistics(self):
-        app = AppTest.from_file(str(Path(__file__).with_name("app.py")), default_timeout=30).run()
+        app = AppTest.from_file(str((Path(__file__).resolve().parent.parent / "app.py")), default_timeout=30).run()
         # AppTest uses the underlying identity values, obtainable via each lot widget key.
         identities = [w.key[:-3] for w in app.text_input if w.label == "Lot"]
         next(w for w in app.selectbox if w.label == "Correction de force").select("Valeur saisie").run()
@@ -86,7 +89,7 @@ class InterfaceTests(unittest.TestCase):
         self.assertFalse(app.session_state[identities[1] + "_treatment_applied"].crop)
 
     def test_analysis_and_zones(self):
-        app = AppTest.from_file(str(Path(__file__).with_name("app.py")), default_timeout=30).run()
+        app = AppTest.from_file(str((Path(__file__).resolve().parent.parent / "app.py")), default_timeout=30).run()
         next(w for w in app.checkbox if w.label == "Activer l'analyse et les annotations").check().run()
         next(w for w in app.selectbox if w.label == "Extrême de force").select("Maximum positif").run()
         self.assertFalse(app.exception)
@@ -129,7 +132,7 @@ class InterfaceTests(unittest.TestCase):
         self.assertFalse(next(w for w in app.checkbox if w.label == "Confirmer l'évènement comme rupture").value)
 
     def test_apply_compare_error_and_reset(self):
-        app = AppTest.from_file(str(Path(__file__).with_name("app.py")), default_timeout=30).run()
+        app = AppTest.from_file(str((Path(__file__).resolve().parent.parent / "app.py")), default_timeout=30).run()
         baseline = json.loads(chart_element(app).proto.spec)["data"][0]
         self.assertTrue(next(w for w in app.number_input if w.label == "Force à soustraire (N)").disabled)
         next(w for w in app.selectbox if w.label == "Correction de force").select("Valeur saisie").run()
@@ -164,7 +167,7 @@ class InterfaceTests(unittest.TestCase):
         self.assertEqual(restored["y"], baseline["y"])
 
     def test_examples_views_and_export_settings(self):
-        app = AppTest.from_file(str(Path(__file__).with_name("app.py")), default_timeout=30).run()
+        app = AppTest.from_file(str((Path(__file__).resolve().parent.parent / "app.py")), default_timeout=30).run()
         self.assertFalse(app.exception)
         self.assertFalse(app.exception)
         chart = chart_element(app)
@@ -175,6 +178,12 @@ class InterfaceTests(unittest.TestCase):
         figure = json.loads(chart.proto.spec)
         self.assertEqual(len(figure["data"]), 3)
         self.assertEqual([len(t["x"]) for t in figure["data"]], [941, 478, 6797])
+        self.assertEqual(figure["layout"]["legend"]["orientation"], "h")
+        self.assertLess(figure["layout"]["legend"]["y"], 0)
+        self.assertEqual(figure["layout"]["xaxis"]["title"]["text"], "Displacement (mm)")
+        self.assertTrue(all(not panel.proto.expanded for panel in app.expander))
+        self.assertTrue(any(w.label == "Axes" for w in app.main.selectbox))
+        self.assertFalse(any(w.label == "Axes" for w in app.sidebar.selectbox))
         config = json.loads(chart.proto.config)
         self.assertEqual(config["toImageButtonOptions"]["format"], "png")
         self.assertEqual(config["toImageButtonOptions"]["width"], 1600)
@@ -192,3 +201,4 @@ class InterfaceTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

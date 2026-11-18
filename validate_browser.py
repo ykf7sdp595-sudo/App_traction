@@ -129,13 +129,13 @@ def main():
                     print("PASS : graphique réel, légende, placement immédiat au point 200, confirmation, anti-doublon, annulation, déplacement d'étiquette, PNG 1600x900.")
             finally:
                 for process in reversed(processes):
-                    process.terminate()
-                    try:
-                        process.wait(timeout=8)
-                    except subprocess.TimeoutExpired:
-                        process.kill()
-                        process.wait()
+                    if process.poll() is None:
+                        subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'],
+                                       stdout=log, stderr=log, check=False,
+                                       creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+                        process.wait(timeout=15)
 
 
 if __name__ == "__main__":
     main()
+

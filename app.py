@@ -15,7 +15,7 @@ from chart_ui import draw_chart, reset_legend_visibility
 from curve_summary import build_summary
 
 
-st.set_page_config(page_title="Courbes de traction", layout="wide")
+st.set_page_config(page_title="Courbes de traction", page_icon="📈", layout="wide")
 
 
 @st.cache_data(max_entries=100, show_spinner=False)
@@ -29,6 +29,7 @@ AXES = {"Force / déplacement": ("displacement", "force"),
         "Force / temps": ("time", "force"),
         "Déplacement / temps": ("time", "displacement")}
 LABELS = {"force": "Force (N)", "displacement": "Déplacement (mm)", "time": "Temps (s)"}
+PLOT_LABELS = {"force": "Force (N)", "displacement": "Displacement (mm)", "time": "Time (s)"}
 
 
 def axis_range(label: str, key: str):
@@ -45,50 +46,56 @@ def axis_range(label: str, key: str):
 
 
 def main():
-    st.title("Courbes de traction")
+    st.title("📈 Courbes de traction")
     st.caption("Chargez vos essais, comparez les courbes et préparez vos graphiques de rapport.")
     with st.expander("Premiers pas", icon=":material/help:"):
         st.markdown("1. **Charger** vos fichiers dans le panneau gauche.\n2. **Ajuster** une courbe dans son onglet : présentation, traitements, analyse.\n3. **Comparer** sur le graphique et ajouter vos évènements si nécessaire.\n4. **Exporter** avec l'appareil photo du graphique, après avoir placé les étiquettes.")
         st.caption("Présentation et analyse : effet immédiat. Traitements : cliquer sur « Appliquer à cette courbe ». Les données originales sont conservées ; les réglages ne sont pas sauvegardés entre sessions.")
     with st.sidebar:
-        st.header("Fichiers")
+        st.header("📂 Fichiers de mesures")
         uploaded = st.file_uploader("CSV, ASCII ou TXT", type=["csv", "tra", "txt"], accept_multiple_files=True)
-        st.header("Graphique")
+        st.caption("Sélectionnez plusieurs fichiers pour superposer vos essais.")
+        import_diagnostics_slot = st.container()
+        st.divider()
+        st.caption("🔒 Données traitées localement · Réglages conservés pendant la session.")
+
+    sources = [(f.name, f.getvalue()) for f in uploaded]
+    if not sources:
+        st.info("👈 Chargez vos fichiers dans le panneau de gauche pour afficher les courbes.")
+        return
+
+    st.subheader("📈 Comparaison des courbes")
+    chart_area = st.container()
+    st.subheader("⚙️ Réglages du graphique")
+    with st.expander("Présentation et axes du graphique", icon=":material/tune:"):
         view = st.selectbox("Axes", list(AXES))
-        title = st.text_input("Titre", "Comparaison des essais")
+        title = st.text_input("Titre", "Tensile test comparison")
         legend = st.checkbox("Afficher la légende", value=True)
         compare = st.checkbox("Comparer au signal brut", value=False)
         move_labels = st.checkbox("Déplacer les étiquettes à la souris", value=True)
         st.session_state.setdefault("label_position_revision", 0)
         if st.button("Réinitialiser la position des étiquettes"):
             st.session_state.label_position_revision += 1
-        with st.expander("Cadrage et dimensions"):
-            height = st.slider("Hauteur à l'écran (px)", 400, 1000, 600, 50)
-            x_range = axis_range("X", "xrange")
-            y_range = axis_range("Y", "yrange")
-        with st.expander("Exporter une image PNG", icon=":material/download:"):
-            filename = st.text_input("Nom du PNG (sans extension)", "courbes_traction")
-            png_width = st.number_input("Largeur (px)", 600, 4000, 1600, 100)
-            png_height = st.number_input("Hauteur (px)", 400, 3000, 900, 100)
-            scale = st.selectbox("Échelle de résolution", [1, 2, 3], index=0)
-            st.caption(f"Image exportée : {png_width * scale} × {png_height * scale} pixels. Utiliser l'icône appareil photo du graphique.")
+    with st.expander("Cadrage et dimensions", icon=":material/crop:"):
+        height = st.slider("Hauteur à l'écran (px)", 400, 1000, 600, 50)
+        x_range = axis_range("X", "xrange")
+        y_range = axis_range("Y", "yrange")
+    with st.expander("Exporter une image PNG", icon=":material/download:"):
+        filename = st.text_input("Nom du PNG (sans extension)", "courbes_traction")
+        png_width = st.number_input("Largeur (px)", 600, 4000, 1600, 100)
+        png_height = st.number_input("Hauteur (px)", 400, 3000, 900, 100)
+        scale = st.selectbox("Échelle de résolution", [1, 2, 3], index=0)
+        st.caption(f"Image exportée : {png_width * scale} × {png_height * scale} pixels. Utiliser l'icône appareil photo du graphique.")
 
-    sources = [(f.name, f.getvalue()) for f in uploaded]
-    if not sources:
-        st.info("Chargez vos fichiers dans le panneau de gauche pour afficher les courbes.")
-        return
-
-    st.subheader("Comparaison des courbes")
-    # Réserver la vue en haut pour garder le résultat proche des réglages.
-    chart_area = st.container()
-    st.subheader("Réglages par courbe")
+    st.subheader("🎨 Réglages par courbe")
     curves = []
+    import_diagnostics = []
     # Dédupliquer les fichiers avant de créer les onglets.
     unique_sources = {}
     for name, content in sources:
         identity = sha256(name.encode() + b"\0" + content).hexdigest()
         if identity in unique_sources:
-            st.caption(f"Doublon ignoré : {name}")
+            import_diagnostics.append(f"Doublon ignoré : {name}")
         unique_sources[identity] = (name, content)
     sources = list(unique_sources.values())
     st.caption("Choisissez une courbe puis ouvrez la section utile. Les lots et les marqueurs libres se règlent sous les onglets.")
@@ -99,7 +106,7 @@ def main():
             # Identité stable : les réglages restent associés au fichier même si l'ordre change.
             identity = sha256(name.encode() + b"\0" + content).hexdigest()
             if identity in seen:
-                st.caption(f"Doublon ignoré : {name}")
+                import_diagnostics.append(f"Doublon ignoré : {name}")
                 continue
             seen.add(identity)
             try:
@@ -111,8 +118,7 @@ def main():
                 with st.expander("Présentation et données", icon=":material/table_chart:"):
                     st.caption(f"{len(measurement.rows):,} points")
                     st.caption(f"{measurement.profile} · encodage {measurement.encoding}")
-                    for warning in measurement.warnings:
-                        st.caption(warning)
+                    import_diagnostics.extend(f"{name} : {warning}" for warning in measurement.warnings)
                     a, b, c = st.columns([1, 3, 1])
                     visible = a.checkbox("Afficher", True, key=identity + "visible",
                                          on_change=reset_legend_visibility, args=(identity,))
@@ -145,6 +151,12 @@ def main():
                                color=color, visible=visible and valid, mapping=mapping, units=units, settings=settings,
                                valid=valid, lot=lot, include_stats=include_stats, tab_index=index))
 
+    if import_diagnostics:
+        with import_diagnostics_slot:
+            with st.expander(f"⚠️ Informations d’import ({len(import_diagnostics)})"):
+                for message in import_diagnostics:
+                    st.warning(message)
+
     curves = batch_panel(curves)
     x_quantity, y_quantity = AXES[view]
     figure = go.Figure()
@@ -168,13 +180,13 @@ def main():
         curve_tabs[curve["tab_index"]].caption(" ; ".join(notes) if notes else "Signal brut, aucun traitement.")
         if compare and notes:
             figure.add_trace(go.Scattergl(x=raw[x_quantity], y=raw[y_quantity],
-                             name=curve["label"] + " · brut", uid=curve["identity"] + "raw",
+                             name=curve["label"] + " · raw", uid=curve["identity"] + "raw",
                              meta=dict(curve_id=curve["identity"]),
                              mode="lines" if len(raw[x_quantity]) > 1 else "markers",
                              line=dict(color=curve["color"], width=1, dash="dot"), opacity=0.45,
                              customdata=list(range(1, len(raw[x_quantity]) + 1)),
                              hovertemplate="Point source %{customdata}<br>X : %{x:.6g}<br>Y : %{y:.6g}<extra>%{fullData.name}</extra>"))
-        figure.add_trace(go.Scattergl(x=x, y=y, name=curve["label"] + (" · traité" if notes else ""), uid=curve["identity"],
+        figure.add_trace(go.Scattergl(x=x, y=y, name=curve["label"] + (" · processed" if notes else ""), uid=curve["identity"],
                          meta=dict(curve_id=curve["identity"]),
                          mode="lines" if len(x) > 1 else "markers", line=dict(color=curve["color"], width=2),
                          marker=dict(color=curve["color"]), customdata=point_numbers,
@@ -198,11 +210,11 @@ def main():
                          clickmode="event+select" if event_click else "event",
                          editrevision=f"{view}:{annotation_signature}:{st.session_state.label_position_revision}",
                          height=height, showlegend=legend, hovermode="closest",
-                         legend=dict(orientation="h", y=-0.2, bgcolor="white", font=dict(color="#202124")), margin=dict(l=70, r=30, t=70, b=100),
+                         legend=dict(orientation="h", y=-0.2, bgcolor="white", font=dict(color="#202124")), margin=dict(l=70, r=30, t=70, b=140),
                          # Conserve le zoom lors des changements de couleur ou de titre.
                          uirevision=f"{view}:{x_range}:{y_range}:{[(c['settings'], c['units'], c['mapping']) for c in curves]}")
-    figure.update_xaxes(title_text=LABELS[x_quantity], range=x_range, autorange=x_range is None)
-    figure.update_yaxes(title_text=LABELS[y_quantity], range=y_range, autorange=y_range is None)
+    figure.update_xaxes(title_text=PLOT_LABELS[x_quantity], range=x_range, autorange=x_range is None)
+    figure.update_yaxes(title_text=PLOT_LABELS[y_quantity], range=y_range, autorange=y_range is None)
     # Style explicite commun à l'écran et au PNG, indépendant du thème Streamlit.
     figure.update_xaxes(color="#202124", gridcolor="#e5e7eb", zerolinecolor="#9ca3af")
     figure.update_yaxes(color="#202124", gridcolor="#e5e7eb", zerolinecolor="#9ca3af")
@@ -234,3 +246,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

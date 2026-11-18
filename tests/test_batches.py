@@ -48,3 +48,4 @@ class BatchTests(unittest.TestCase):
         a["settings"] = Settings(smoothing=True, window=3)
         self.assertEqual(lot_statistics([a])[0][0]["Valeur (N)"], 9)
         self.assertEqual(lot_statistics([a], filtered=True)[0][0]["Valeur (N)"], 4.5)
+

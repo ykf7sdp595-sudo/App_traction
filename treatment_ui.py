@@ -63,3 +63,4 @@ def treatment_controls(identity, count):
     st.caption(f"Correction de force validée : {applied.offset_mode}"
                + (f" — soustraction de {applied.offset:g} N" if applied.offset_mode == "Valeur saisie" else ""))
     return applied
+

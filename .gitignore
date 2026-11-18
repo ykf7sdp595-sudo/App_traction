@@ -17,3 +17,9 @@ unit_exe.log
 Data*.txt
 validation_results.json
 SAUVEGARDE_MANIFEST.json
+*.xlsx
+*.xlsm
+*.png
+*.log
+.streamlit/secrets.toml
+
