@@ -48,4 +48,3 @@ finally:
     if process.poll() is None:
         subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'],
                        capture_output=True, creationflags=subprocess.CREATE_NO_WINDOW)
-

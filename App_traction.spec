@@ -23,4 +23,3 @@ pyz = PYZ(a.pure)
 exe = EXE(pyz, a.scripts, a.binaries, a.datas, [], name='App_traction',
           debug=False, bootloader_ignore_signals=False, strip=False,
           upx=False, console=True)
-

@@ -86,4 +86,3 @@ UNITS = {"force": {"N": 1.0, "kN": 1000.0, "mN": 0.001},
 def column_values(measurement: Measurement, column: int, quantity: str, unit: str) -> list[float]:
     factor = UNITS[quantity][unit]
     return [row[column] * factor for row in measurement.rows]
-

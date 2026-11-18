@@ -40,4 +40,3 @@ def build_summary(rendered, events, hidden, y_label):
         for row, value in zip(stats, results):
             row[column] = value
     return rows, stats
-

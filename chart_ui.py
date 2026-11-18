@@ -107,4 +107,3 @@ def draw_chart(figure, config, point_click):
            on_visibility_change=visibility_changed, on_point_change=point_changed)
     if st.session_state.get("last_added_event"):
         st.button("Annuler le dernier marqueur", on_click=undo_last_event, icon=":material/undo:")
-

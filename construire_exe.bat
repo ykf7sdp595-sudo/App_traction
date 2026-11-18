@@ -12,4 +12,3 @@ if errorlevel 1 exit /b 1
 if errorlevel 1 exit /b 1
 echo Executable cree : %CD%\dist\App_traction.exe
 pause
-

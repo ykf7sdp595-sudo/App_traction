@@ -15,4 +15,3 @@
 
 Version précédemment sauvegardée le 5 novembre 2026, conservée dans la branche
 [`v1`](https://github.com/ykf7sdp595-sudo/App_traction/tree/v1) et dans l'historique Git.
-

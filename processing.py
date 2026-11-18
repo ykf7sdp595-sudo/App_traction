@@ -112,4 +112,3 @@ def process(signals: dict[str, list[float]], settings: Settings):
     if any(not isfinite(v) for values in data.values() for v in values):
         raise ValueError("Valeur non finie après traitement ; vérifier les unités et paramètres.")
     return data, list(range(start + 1, end + 1)), notes
-

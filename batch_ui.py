@@ -76,4 +76,3 @@ def batch_panel(curves):
             st.dataframe(details, hide_index=True, key="lot_details")
             st.caption("Écart-type d'échantillon : n − 1 ; non calculable pour moins de deux courbes. Les réglages individuels restent possibles : vérifier la colonne Traitements avant de comparer des essais.")
         return selected_curves
-

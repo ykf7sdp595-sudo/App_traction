@@ -124,4 +124,3 @@ def event_panel(figure, rendered):
                 bgcolor="white", font=dict(color="#202124"), borderpad=4,
                 bordercolor=marker["color"], arrowcolor=marker["color"])
     return bool(st.session_state.event_click_target)
-

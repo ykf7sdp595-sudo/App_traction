@@ -348,4 +348,3 @@ En cas de problème de lancement :
 - Port occupé : garder l'application déjà ouverte ou lancer `launcher.py --port 8502`.
 - Pour arrêter l'application : fermer le dernier onglet ou utiliser Ctrl+C dans
   le terminal. Les réglages et la session ne sont pas enregistrés.
-

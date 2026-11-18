@@ -22,4 +22,3 @@ SAUVEGARDE_MANIFEST.json
 *.png
 *.log
 .streamlit/secrets.toml
-

@@ -94,4 +94,3 @@ def rupture_candidate(values, drop=10.0, window=20, minimum=10.0, direction="Pos
             previous.pop()
         previous.append(i)
     return None
-

@@ -13,4 +13,3 @@ if errorlevel 1 (
 )
 ".venv\Scripts\python.exe" launcher.py
 if errorlevel 1 pause
-

@@ -41,4 +41,3 @@ validation locale ne reproduit pas les politiques de sécurité de chaque poste.
 - Import réel des exemples TRA, CSV et TXT : 941, 478 et 6 797 points.
 - Affichage des trois courbes, masquage/réaffichage par légende et PNG 1600 × 900 : réussis.
 - Suite existante : 27 tests réussis.
-
